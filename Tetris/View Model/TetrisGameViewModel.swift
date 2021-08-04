@@ -6,18 +6,52 @@
 //
 
 import SwiftUI
+import Combine
 
-class TetrisGameModelView: ObservableObject {
-    var numRows: Int
-    var numColumns: Int
-    @Published var gameBoard: [[TetrisGameSquare]]
+class TetrisGameViewModel: ObservableObject {
+    @Published var tetrisGameModel = TetrisGameModel()
     
-    init(numRows: Int = 23, numColumns: Int = 10) {
-        self.numRows = numRows
-        self.numColumns = numColumns
-        
-        //allowing access to gameboard -> gameBoard[][] columns / rows respectivly 
-        gameBoard = Array(repeating: Array(repeating: TetrisGameSquare(color: Color.tetrisBlack), count: numRows), count: numColumns)
+    var numRows: Int {tetrisGameModel.numRows}
+    var numColumns: Int {tetrisGameModel.numColumns}
+    var gameBoard: [[TetrisGameSquare]] {
+        tetrisGameModel.gameBoard.map{$0.map(convertToSquare)}
+    }
+    
+    var anyCancellable: AnyCancellable?
+    
+    init() {
+        anyCancellable = tetrisGameModel.objectWillChange.sink {
+            self.objectWillChange.send()
+        }
+    }
+    
+    func convertToSquare(block: TetrisGameBlock?) -> TetrisGameSquare {
+        return TetrisGameSquare(color: getColor(blockType: block?.blockType))
+    }
+    
+    func getColor(blockType: BlockType?) -> Color {
+        switch blockType {
+        case .i:
+            return .tetrisLightBlue
+        case .j:
+            return .tetrisDarkBlue
+        case .l:
+            return .tetrisOrange
+        case .o:
+            return .tetrisYellow
+        case .s:
+            return .tetrisGreen
+        case .t:
+            return .tetrisPurple
+        case .z:
+            return .tetrisRed
+        case .none:
+            return .tetrisBlack
+        }
+    }
+    
+    func squareClicked(row: Int, column: Int){
+        tetrisGameModel.blockClicked(row: row, column: column)
     }
 }
 

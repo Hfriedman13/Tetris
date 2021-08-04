@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TetrisGameView: View {
     
-    @ObservedObject var tetrisGame = TetrisGameModelView()
+    @ObservedObject var tetrisGame = TetrisGameViewModel()
     
     var body: some View {
         GeometryReader{(geometry: GeometryProxy) in
@@ -35,6 +35,9 @@ struct TetrisGameView: View {
                     path.addRect(rect)
                 }
                 .fill(self.tetrisGame.gameBoard[column][row].color)
+                .onTapGesture {
+                    self.tetrisGame.squareClicked(row: row, column: column)
+                }
         }
     }
 }
