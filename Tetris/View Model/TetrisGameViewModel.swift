@@ -14,7 +14,14 @@ class TetrisGameViewModel: ObservableObject {
     var numRows: Int {tetrisGameModel.numRows}
     var numColumns: Int {tetrisGameModel.numColumns}
     var gameBoard: [[TetrisGameSquare]] {
-        tetrisGameModel.gameBoard.map{$0.map(convertToSquare)}
+        var board = tetrisGameModel.gameBoard.map{$0.map(convertToSquare)}
+        
+        if let tetromino = tetrisGameModel.tetromino{
+            for blockLocation in tetromino.blocks{
+                board[blockLocation.column + tetromino.origin.column][blockLocation.row + tetromino.origin.row] = TetrisGameSquare(color: getColor(blockType: tetromino.blockType))
+            }
+        }
+        return board
     }
     
     var anyCancellable: AnyCancellable?
