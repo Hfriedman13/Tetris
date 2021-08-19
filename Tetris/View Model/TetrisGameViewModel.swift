@@ -25,6 +25,7 @@ class TetrisGameViewModel: ObservableObject {
     }
     
     var anyCancellable: AnyCancellable?
+    var lastMoveLocation: CGPoint?
     
     init() {
         anyCancellable = tetrisGameModel.objectWillChange.sink {
@@ -59,6 +60,50 @@ class TetrisGameViewModel: ObservableObject {
     
     func squareClicked(row: Int, column: Int){
         tetrisGameModel.blockClicked(row: row, column: column)
+    }
+    
+    func getMoveGesture() -> some Gesture {
+        return DragGesture()
+        .onChanged(onMoveChanged(value:))
+        .onEnded(onMoveEnded(_:))
+    }
+    
+    func onMoveChanged(value: DragGesture.Value){
+        guard  let start = lastMoveLocation else {
+            lastMoveLocation = value.location
+            return
+        }
+        let xDiff = value.location.x - start.x
+        if xDiff > 10 {
+            print("Moving right")
+            let _ = tetrisGameModel.moveTetrominoRight()
+            lastMoveLocation = value.location
+            return
+        }
+        if xDiff < -10 {
+            print("Moving left")
+            let _ = tetrisGameModel.moveTetrominoLeft()
+            lastMoveLocation = value.location
+            return
+        }
+        
+        let yDiff = value.location.y - start.y
+        if yDiff > 10 {
+            print("Dropping")
+            tetrisGameModel.dropTetromino()
+            lastMoveLocation = value.location
+            return
+        }
+        if yDiff < -10 {
+            print("Moving down")
+            let _ = tetrisGameModel.moveTetrominoDown()
+            lastMoveLocation = value.location
+            return
+        }
+    }
+    
+    func onMoveEnded(_: DragGesture.Value) {
+        lastMoveLocation = nil
     }
 }
 
