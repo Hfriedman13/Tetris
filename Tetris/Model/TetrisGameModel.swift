@@ -44,6 +44,12 @@ class TetrisGameModel: ObservableObject {
     }
     
     func runEngine(timer: Timer) {
+        //check if need to clear line
+        if clearLines() {
+            print("Line Cleared")
+            return
+        }
+        
         //spawn new block if needed
         guard tetromino != nil else {
             print("Spawning new Tetromino")
@@ -121,6 +127,33 @@ class TetrisGameModel: ObservableObject {
             gameBoard[column][row] = TetrisGameBlock(blockType: currentTetromino.blockType)
         }
         tetromino = nil
+    }
+    //creating extra gameboard and going row by row to see if need to copy line
+    //making sure entire row is full of null pieces - if entire row is full
+    //dont copy that row over
+    func clearLines() -> Bool {
+        var newBoard: [[TetrisGameBlock?]] = Array(repeating: Array(repeating: nil, count: numRows), count: numColumns)
+        var boardUpdated = false
+        var nextRowToCopy = 0
+        
+        for row in 0...numRows-1 {
+            var clearLine = true
+            for column in 0...numColumns-1 {
+                clearLine = clearLine && gameBoard[column][row] != nil
+            }
+            
+            if !clearLine {
+                for column in 0...numColumns-1 {
+                    newBoard[column][nextRowToCopy] = gameBoard[column][row]
+                }
+                nextRowToCopy += 1
+            }
+            boardUpdated = boardUpdated || clearLine
+        }
+        if boardUpdated {
+            gameBoard = newBoard
+        }
+        return boardUpdated
     }
 }
 

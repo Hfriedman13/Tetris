@@ -89,14 +89,15 @@ class TetrisGameViewModel: ObservableObject {
         
         let yDiff = value.location.y - start.y
         if yDiff > 10 {
-            print("Dropping")
-            tetrisGameModel.dropTetromino()
-            lastMoveLocation = value.location
-            return
-        }
-        if yDiff < -10 {
             print("Moving down")
             let _ = tetrisGameModel.moveTetrominoDown()
+            lastMoveLocation = value.location
+            return
+            
+        }
+        if yDiff < -10 {
+            print("Dropping")
+            tetrisGameModel.dropTetromino()
             lastMoveLocation = value.location
             return
         }
