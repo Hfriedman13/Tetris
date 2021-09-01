@@ -82,8 +82,10 @@ class TetrisGameViewModel: ObservableObject {
             return .tetrisBlack
         }
     }
-    func squareClicked(row: Int, column: Int){
-        tetrisGameModel.blockClicked(row: row, column: column)
+    
+    func getRotateGesture() -> some Gesture {
+        return TapGesture()
+            .onEnded({self.tetrisGameModel.rotateTetromino(clockwise: true)})
     }
     
     func getMoveGesture() -> some Gesture {
